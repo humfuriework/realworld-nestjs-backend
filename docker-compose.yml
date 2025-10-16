@@ -1,0 +1,50 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile
+      target: development
+    container_name: nest-app
+    ports:
+      - "3000:3000"
+      - "9229:9229"
+    volumes:
+      - .:/app:delegated
+    command: sh -c "cd /app && npm run start:dev"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - nest-network
+    stdin_open: true
+    tty: true
+  postgres:
+    image: postgres:15-alpine
+    container_name: nest-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: nestjs_db
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nest-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  nest-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
