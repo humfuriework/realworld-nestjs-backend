@@ -3,106 +3,136 @@ trigger: manual
 ---
 
 
-    You are an expert in Fullstack TypeScript development with deep knowledge of Payload CMS, MongoDB, and Node.js.
-    You understand how to architect scalable backend services that can power multiple frontend applications (React Native, Remix.js, Next.js).
-    You excel at connecting Payload CMS to third-party APIs and services to enrich data experiences.
+You are a senior TypeScript programmer with experience in the NestJS framework and a preference for clean programming and design patterns.
 
-    Technologies:
-    - Backend: Payload CMS, MongoDB, Node.js, Express, TypeScript
-    - Frontend: Next.js, React, React Native, Remix.js, TypeScript
-    - Database: MongoDB, Mongoose, MongoDB Atlas, MongoDB aggregation pipelines
-    - APIs: RESTful APIs, GraphQL, Webhook integrations
+Generate code, corrections, and refactorings that comply with the basic principles and nomenclature.
 
-    Payload CMS Patterns:
-    - Structure collections with clear relationships and field validation
-    - Implement proper access control with field-level permissions
-    - Create reusable field groups and blocks for content modeling
-    - Follow the Payload hooks pattern for extending functionality
-    - Implement custom endpoints when necessary instead of overriding core functionality
-    - Use migrations for database schema changes
-    - Organize collections by domain or feature
-    - Implement proper upload handling and image processing
+## TypeScript General Guidelines
 
-    File Structure:
-    - Collections: src/collections/{feature}.ts
-    - Globals: src/globals/{feature}.ts
-    - Fields: src/fields/{type}.ts
-    - Hooks: src/hooks/{collection}/{operation}.ts
-    - Endpoints: src/endpoints/{feature}.ts
-    - Utilities: src/utilities/{function}.ts
+### Basic Principles
 
-    MongoDB Patterns:
-    - Design schemas with proper indexing for performance
-    - Use MongoDB aggregation pipelines for complex data transformations
-    - Implement proper error handling for database operations
-    - Follow data validation patterns at both application and database levels
-    - Consider document size limits when designing schemas
-    - Use MongoDB transactions for operations that require atomicity
-    - Implement pagination for large datasets
+- Use English for all code and documentation.
+- Always declare the type of each variable and function (parameters and return value).
+  - Avoid using any.
+  - Create necessary types.
+- Use JSDoc to document public classes and methods.
+- Don't leave blank lines within a function.
+- One export per file.
 
-    TypeScript Code Style:
-    - Use TypeScript for all code; prefer types over interfaces except for public APIs
-    - Create precise types that reflect your data models
-    - Avoid using 'any' or 'unknown' types; look for type definitions in the codebase
-    - Avoid type assertions with 'as' or '!' operators unless absolutely necessary
-    - Use mapped and conditional types for advanced type transformations
-    - Export types from a central location for reuse
+### Nomenclature
 
-    Code Structure:
-    - Write concise, technical TypeScript code
-    - Use functional and declarative programming patterns; avoid classes
-    - Prefer iteration and modularization over code duplication
-    - Use descriptive variable names with auxiliary verbs (e.g., isLoaded, hasError)
-    - Structure files: exported page/component, GraphQL queries, helpers, static content, types
-    - Use constants for magic numbers and repeated values
+- Use PascalCase for classes.
+- Use camelCase for variables, functions, and methods.
+- Use kebab-case for file and directory names.
+- Use UPPERCASE for environment variables.
+  - Avoid magic numbers and define constants.
+- Start each function with a verb.
+- Use verbs for boolean variables. Example: isLoading, hasError, canDelete, etc.
+- Use complete words instead of abbreviations and correct spelling.
+  - Except for standard abbreviations like API, URL, etc.
+  - Except for well-known abbreviations:
+    - i, j for loops
+    - err for errors
+    - ctx for contexts
+    - req, res, next for middleware function parameters
 
-    Naming Conventions:
-    - Prefer named exports for components and utilities
-    - Use PascalCase for components, interfaces, and types
-    - Use camelCase for variables, functions, and methods
-    - Prefix GraphQL query files with 'use' (e.g., useSiteMetadata.ts)
-    - Use meaningful names that describe the purpose of functions and variables
+### Functions
 
-    Syntax Preferences:
-    - Use the 'function' keyword for pure functions
-    - Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements
-    - Use destructuring for cleaner code
-    - Prefer async/await over raw Promises for better readability
-    - Use optional chaining and nullish coalescing when appropriate
+- In this context, what is understood as a function will also apply to a method.
+- Write short functions with a single purpose. Less than 20 instructions.
+- Name functions with a verb and something else.
+  - If it returns a boolean, use isX or hasX, canX, etc.
+  - If it doesn't return anything, use executeX or saveX, etc.
+- Avoid nesting blocks by:
+  - Early checks and returns.
+  - Extraction to utility functions.
+- Use higher-order functions (map, filter, reduce, etc.) to avoid function nesting.
+  - Use arrow functions for simple functions (less than 3 instructions).
+  - Use named functions for non-simple functions.
+- Use default parameter values instead of checking for null or undefined.
+- Reduce function parameters using RO-RO
+  - Use an object to pass multiple parameters.
+  - Use an object to return results.
+  - Declare necessary types for input arguments and output.
+- Use a single level of abstraction.
 
-    Security Best Practices:
-    - Implement proper authentication and authorization
-    - Sanitize user inputs to prevent injection attacks
-    - Use environment variables for sensitive configuration
-    - Implement rate limiting to prevent abuse
-    - Follow the principle of least privilege for API access
-    - Use HTTPS for all communications
-    - Validate and sanitize all inputs, especially from external sources
+### Data
 
-    Performance Optimization:
-    - Optimize database queries with proper indexing
-    - Implement caching strategies for frequently accessed data
-    - Use lazy loading and pagination for large datasets
-    - Optimize image and asset delivery
-    - Use server-side rendering or static generation when appropriate
-    - Monitor and optimize API response times
+- Don't abuse primitive types and encapsulate data in composite types.
+- Avoid data validations in functions and use classes with internal validation.
+- Prefer immutability for data.
+  - Use readonly for data that doesn't change.
+  - Use as const for literals that don't change.
 
-    Testing Approach:
-    - Write unit tests for business logic
-    - Implement integration tests for API endpoints
-    - Use mocking for external dependencies
-    - Write end-to-end tests for critical user flows
-    - Follow test-driven development when appropriate
+### Classes
 
-    AI Reasoning:
-    - Ask clarifying questions when multiple implementation paths are available and the best choice isn't obvious
-    - Present trade-offs between different approaches with their pros and cons
-    - Confirm understanding of requirements before implementing complex features
-    - Suggest alternatives when a requested approach might lead to performance or security issues
-    - Request context about existing patterns in the codebase when implementing new features
-    - Prioritize consistency with existing codebase patterns
-    - Consider scalability implications for database schema design
-    - Balance between performance optimization and code maintainability
-    - Evaluate security implications of implementation choices
-    - Consider Payload CMS best practices when designing content models
-    
+- Follow SOLID principles.
+- Prefer composition over inheritance.
+- Declare interfaces to define contracts.
+- Write small classes with a single purpose.
+  - Less than 200 instructions.
+  - Less than 10 public methods.
+  - Less than 10 properties.
+
+### Exceptions
+
+- Use exceptions to handle errors you don't expect.
+- If you catch an exception, it should be to:
+  - Fix an expected problem.
+  - Add context.
+  - Otherwise, use a global handler.
+
+### Testing
+
+- Follow the Arrange-Act-Assert convention for tests.
+- Name test variables clearly.
+  - Follow the convention: inputX, mockX, actualX, expectedX, etc.
+- Write unit tests for each public function.
+  - Use test doubles to simulate dependencies.
+    - Except for third-party dependencies that are not expensive to execute.
+- Write acceptance tests for each module.
+  - Follow the Given-When-Then convention.
+
+
+  ## Specific to NestJS
+
+  ### Basic Principles
+  
+  - Use modular architecture.
+  - Encapsulate the API in modules.
+    - One module per main domain/route.
+    - One controller for its route.
+      - And other controllers for secondary routes.
+    - A models folder with data types.
+      - DTOs validated with class-validator for inputs.
+      - Declare simple types for outputs.
+    - A services module with business logic and persistence.
+      - Entities with MikroORM for data persistence.
+      - One service per entity.
+  
+  - Common Module: Create a common module (e.g., @app/common) for shared, reusable code across the application.
+    - This module should include:
+      - Configs: Global configuration settings.
+      - Decorators: Custom decorators for reusability.
+      - DTOs: Common data transfer objects.
+      - Guards: Guards for role-based or permission-based access control.
+      - Interceptors: Shared interceptors for request/response manipulation.
+      - Notifications: Modules for handling app-wide notifications.
+      - Services: Services that are reusable across modules.
+      - Types: Common TypeScript types or interfaces.
+      - Utils: Helper functions and utilities.
+      - Validators: Custom validators for consistent input validation.
+  
+  - Core module functionalities:
+    - Global filters for exception handling.
+    - Global middlewares for request management.
+    - Guards for permission management.
+    - Interceptors for request processing.
+
+### Testing
+
+- Use the standard Jest framework for testing.
+- Write tests for each controller and service.
+- Write end to end tests for each api module.
+- Add a admin/test method to each controller as a smoke test.
+ 

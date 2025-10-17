@@ -31,6 +31,17 @@
 $ npm install
 ```
 
+## Environment Setup
+
+1. Copy the example environment file:
+```bash
+$ cp .env.example .env
+```
+
+2. Update the `.env` file with your actual values:
+   - Change `JWT_SECRET` to a secure random string
+   - Update database credentials if needed
+
 ## Compile and run the project
 
 ```bash
@@ -57,9 +68,21 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Deployment
+## Docker Development
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+1. Create environment file for Docker:
+```bash
+$ cp .env.example .env.docker
+```
+
+2. Update `.env.docker` with Docker-specific values (database host should be `postgres`)
+
+3. Run with Docker Compose:
+```bash
+$ docker-compose up --build
+```
+
+**Note**: Environment variables are passed to containers via `docker-compose.yml`. For production, use Docker secrets or external configuration management.
 
 If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
 
