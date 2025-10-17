@@ -1,4 +1,4 @@
-name: NestJS CI/CD (TypeORM)
+name: NestJS CI/CD (Alternative)
 
 on:
   workflow_dispatch:
@@ -6,6 +6,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/nestjs_db?schema=public
 
     steps:
       - name: Checkout code
@@ -27,11 +29,8 @@ jobs:
           postgresql user: 'postgres'
           postgresql password: 'postgres'
 
-      - name: Create database schema
-        run: npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:sync
-
       - name: Run database migrations
-        run: npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run
+        run: npx prisma migrate deploy
 
       - name: Build NestJS application
         run: npm run build
