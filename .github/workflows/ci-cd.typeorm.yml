@@ -17,24 +17,24 @@ jobs:
           echo "DATABASE_URL=postgresql://postgres:postgres@postgres:5432/nestjs_db?schema=public" >> .env.docker
 
       - name: Build Docker images
-        run: docker-compose build
+        run: docker compose build
 
       - name: Start services
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Wait for database to be ready
         run: |
-          docker-compose exec -T postgres sh -c 'until pg_isready -U postgres; do sleep 1; done'
+          docker compose exec -T postgres sh -c 'until pg_isready -U postgres; do sleep 1; done'
 
       - name: Run database migrations
-        run: docker-compose exec -T app npx prisma migrate deploy
+        run: docker compose exec -T app npx prisma migrate deploy
 
       - name: Run unit tests
-        run: docker-compose exec -T app npm test
+        run: docker compose exec -T app npm test
 
       - name: Run e2e tests
-        run: docker-compose exec -T app npm run test:e2e
+        run: docker compose exec -T app npm run test:e2e
 
       - name: Stop services
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v
