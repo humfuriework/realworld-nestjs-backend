@@ -32,7 +32,7 @@
     "cache-manager": "^5.7.6",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
-    "nanoid": "^5.0.9",
+    "nanoid": "^4.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
@@ -80,6 +80,9 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!nanoid|@nestjs|rxjs)"
+    ],
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],

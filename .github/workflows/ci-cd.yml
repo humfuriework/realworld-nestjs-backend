@@ -15,34 +15,35 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/nestjs_db?schema=public
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20' # Or your desired Node.js version
+      - name: Create environment file
+        run: |
+          cp .env.example .env.docker
+          echo "DATABASE_URL=postgresql://postgres:postgres@postgres:5432/nestjs_db?schema=public" >> .env.docker
 
-      - name: Install dependencies
-        run: npm install
+      - name: Build Docker images
+        run: docker-compose build
 
-      - name: Setup PostgreSQL
-        uses: harmon758/postgresql-action@v1
-        with:
-          postgresql version: '15'
-          postgresql db: 'nestjs_db'
-          postgresql user: 'postgres'
-          postgresql password: 'postgres'
+      - name: Start services
+        run: docker-compose up -d
+
+      - name: Wait for database to be ready
+        run: |
+          docker-compose exec -T postgres sh -c 'until pg_isready -U postgres; do sleep 1; done'
 
       - name: Run database migrations
-        run: npx prisma migrate deploy
+        run: docker-compose exec -T app npx prisma migrate deploy
 
-      - name: Build NestJS application
-        run: npm run build
+      - name: Run unit tests
+        run: docker-compose exec -T app npm test
 
-      - name: Run tests
-        run: npm run test:e2e
+      - name: Run e2e tests
+        run: docker-compose exec -T app npm run test:e2e
+
+      - name: Stop services
+        if: always()
+        run: docker-compose down -v
