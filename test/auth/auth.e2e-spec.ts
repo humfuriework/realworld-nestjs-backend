@@ -88,7 +88,7 @@ describe('Auth (e2e)', () => {
     });
 
     it('should hash the password', async () => {
-      await request(app.getHttpServer()).post('/auth/register').send({
+      await request(app.getHttpServer()).post('/api/auth/register').send({
         email: 'hash@example.com',
         password: 'mypassword',
       });
@@ -107,7 +107,7 @@ describe('Auth (e2e)', () => {
   describe('/api/auth/login (POST)', () => {
     beforeEach(async () => {
       // Create a user for login tests
-      await request(app.getHttpServer()).post('/auth/register').send({
+      await request(app.getHttpServer()).post('/api/auth/register').send({
         email: 'login@example.com',
         password: 'password123',
         name: 'Login User',
