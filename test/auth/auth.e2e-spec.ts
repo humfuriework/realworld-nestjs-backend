@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../../src/app.module';
@@ -15,6 +15,13 @@ describe('Auth (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api');
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+      }),
+    );
     prisma = app.get<PrismaService>(PrismaService);
     await app.init();
   });
@@ -28,10 +35,10 @@ describe('Auth (e2e)', () => {
     await prisma.user.deleteMany();
   });
 
-  describe('/auth/register (POST)', () => {
+  describe('/api/auth/register (POST)', () => {
     it('should register a new user successfully', () => {
       return request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/api/auth/register')
         .send({
           email: 'test@example.com',
           password: 'password123',
@@ -48,7 +55,7 @@ describe('Auth (e2e)', () => {
 
     it('should register without name', () => {
       return request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/api/auth/register')
         .send({
           email: 'test2@example.com',
           password: 'password123',
@@ -62,14 +69,14 @@ describe('Auth (e2e)', () => {
 
     it('should fail with duplicate email', async () => {
       // First registration
-      await request(app.getHttpServer()).post('/auth/register').send({
+      await request(app.getHttpServer()).post('/api/auth/register').send({
         email: 'duplicate@example.com',
         password: 'password123',
       });
 
       // Second registration with same email
       return request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/api/auth/register')
         .send({
           email: 'duplicate@example.com',
           password: 'different',
@@ -97,7 +104,7 @@ describe('Auth (e2e)', () => {
     });
   });
 
-  describe('/auth/login (POST)', () => {
+  describe('/api/auth/login (POST)', () => {
     beforeEach(async () => {
       // Create a user for login tests
       await request(app.getHttpServer()).post('/auth/register').send({
@@ -109,7 +116,7 @@ describe('Auth (e2e)', () => {
 
     it('should login successfully with correct credentials', () => {
       return request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/api/auth/login')
         .send({
           email: 'login@example.com',
           password: 'password123',
@@ -125,7 +132,7 @@ describe('Auth (e2e)', () => {
 
     it('should fail with wrong password', () => {
       return request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/api/auth/login')
         .send({
           email: 'login@example.com',
           password: 'wrongpassword',
@@ -138,7 +145,7 @@ describe('Auth (e2e)', () => {
 
     it('should fail with non-existent email', () => {
       return request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/api/auth/login')
         .send({
           email: 'nonexistent@example.com',
           password: 'password123',
@@ -152,14 +159,14 @@ describe('Auth (e2e)', () => {
     it('should not leak information about non-existent users', async () => {
       // Test that the error message is the same for wrong password and non-existent user
       const wrongPasswordResponse = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/api/auth/login')
         .send({
           email: 'login@example.com',
           password: 'wrongpassword',
         });
 
       const nonExistentUserResponse = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/api/auth/login')
         .send({
           email: 'nonexistent@example.com',
           password: 'password123',
