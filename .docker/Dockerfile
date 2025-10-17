@@ -17,10 +17,8 @@ COPY prisma ./prisma
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Copy source code
-COPY . .
-
-# Expose ports
+# Note: Source code comes from volume mounts in development
+# No COPY . . needed - volume mounting handles source code
 EXPOSE 3000 9229
 
 # Development Command

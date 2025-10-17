@@ -12,10 +12,8 @@ services:
     volumes:
       - .:/app:delegated
     command: sh -c "cd /app && npm run start:dev"
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+    env_file:
+      - .env.docker
     depends_on:
       postgres:
         condition: service_healthy
