@@ -30,6 +30,12 @@ jobs:
           timeout 60 bash -c 'until docker compose exec -T postgres pg_isready -U postgres; do echo "Waiting for postgres..."; sleep 2; done'
         timeout-minutes: 2
 
+      - name: Install dependencies
+        run: docker compose exec -T app npm install
+
+      - name: Generate Prisma Client
+        run: docker compose exec -T app npx prisma generate
+
       - name: Run database migrations
         run: docker compose exec -T app npx prisma migrate deploy
 
