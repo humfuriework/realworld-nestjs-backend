@@ -1,0 +1,40 @@
+name: NestJS CI/CD (TypeORM)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup PostgreSQL
+        uses: harmon758/postgresql-action@v1
+        with:
+          postgresql version: '15'
+          postgresql db: 'nestjs_db'
+          postgresql user: 'postgres'
+          postgresql password: 'postgres'
+
+      - name: Create database schema
+        run: npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:sync
+
+      - name: Run database migrations
+        run: npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run
+
+      - name: Build NestJS application
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test:e2e
