@@ -22,9 +22,13 @@ jobs:
       - name: Start services
         run: docker compose up -d
 
+      - name: Show service logs
+        run: docker compose logs
+
       - name: Wait for database to be ready
         run: |
-          docker compose exec -T postgres sh -c 'until pg_isready -U postgres; do sleep 1; done'
+          timeout 60 bash -c 'until docker compose exec -T postgres pg_isready -U postgres; do echo "Waiting for postgres..."; sleep 2; done'
+        timeout-minutes: 2
 
       - name: Run database migrations
         run: docker compose exec -T app npx prisma migrate deploy
@@ -34,6 +38,10 @@ jobs:
 
       - name: Run e2e tests
         run: docker compose exec -T app npm run test:e2e
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
 
       - name: Stop services
         if: always()
