@@ -35,51 +35,62 @@ describe('Auth (e2e)', () => {
     await prisma.user.deleteMany();
   });
 
-  describe('/api/auth/register (POST)', () => {
+  describe('/api/users (POST)', () => {
     it('should register a new user successfully', () => {
       return request(app.getHttpServer())
-        .post('/api/auth/register')
+        .post('/api/users')
         .send({
-          email: 'test@example.com',
-          password: 'password123',
-          name: 'Test User',
+          user: {
+            email: 'test@example.com',
+            password: 'password123',
+            username: 'testuser',
+          },
         })
         .expect(201)
         .expect((res) => {
-          expect(res.body).toHaveProperty('id');
-          expect(res.body.email).toBe('test@example.com');
-          expect(res.body.name).toBe('Test User');
-          expect(res.body).not.toHaveProperty('password');
+          expect(res.body.user).toHaveProperty('email');
+          expect(res.body.user.email).toBe('test@example.com');
+          expect(res.body.user.username).toBe('testuser');
+          expect(res.body.user).not.toHaveProperty('password');
         });
     });
 
-    it('should register without name', () => {
+    it('should register without bio', () => {
       return request(app.getHttpServer())
-        .post('/api/auth/register')
+        .post('/api/users')
         .send({
-          email: 'test2@example.com',
-          password: 'password123',
+          user: {
+            email: 'test2@example.com',
+            password: 'password123',
+            username: 'testuser2',
+          },
         })
         .expect(201)
         .expect((res) => {
-          expect(res.body.email).toBe('test2@example.com');
-          expect(res.body.name).toBeNull();
+          expect(res.body.user.email).toBe('test2@example.com');
+          expect(res.body.user.bio).toBeNull();
         });
     });
 
     it('should fail with duplicate email', async () => {
       // First registration
-      await request(app.getHttpServer()).post('/api/auth/register').send({
-        email: 'duplicate@example.com',
-        password: 'password123',
+      await request(app.getHttpServer()).post('/api/users').send({
+        user: {
+          email: 'duplicate@example.com',
+          password: 'password123',
+          username: 'duplicate',
+        },
       });
 
       // Second registration with same email
       return request(app.getHttpServer())
-        .post('/api/auth/register')
+        .post('/api/users')
         .send({
-          email: 'duplicate@example.com',
-          password: 'different',
+          user: {
+            email: 'duplicate@example.com',
+            password: 'different',
+            username: 'duplicate2',
+          },
         })
         .expect(409)
         .expect((res) => {
@@ -88,9 +99,12 @@ describe('Auth (e2e)', () => {
     });
 
     it('should hash the password', async () => {
-      await request(app.getHttpServer()).post('/api/auth/register').send({
-        email: 'hash@example.com',
-        password: 'mypassword',
+      await request(app.getHttpServer()).post('/api/users').send({
+        user: {
+          email: 'hash@example.com',
+          password: 'mypassword',
+          username: 'hashuser',
+        },
       });
 
       // Verify password is hashed in database
@@ -104,38 +118,44 @@ describe('Auth (e2e)', () => {
     });
   });
 
-  describe('/api/auth/login (POST)', () => {
+  describe('/api/users/login (POST)', () => {
     beforeEach(async () => {
       // Create a user for login tests
-      await request(app.getHttpServer()).post('/api/auth/register').send({
-        email: 'login@example.com',
-        password: 'password123',
-        name: 'Login User',
+      await request(app.getHttpServer()).post('/api/users').send({
+        user: {
+          email: 'login@example.com',
+          password: 'password123',
+          username: 'loginuser',
+        },
       });
     });
 
     it('should login successfully with correct credentials', () => {
       return request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/api/users/login')
         .send({
-          email: 'login@example.com',
-          password: 'password123',
+          user: {
+            email: 'login@example.com',
+            password: 'password123',
+          },
         })
         .expect(201)
         .expect((res) => {
-          expect(res.body).toHaveProperty('id');
-          expect(res.body.email).toBe('login@example.com');
-          expect(res.body.name).toBe('Login User');
-          expect(res.body).not.toHaveProperty('password');
+          expect(res.body.user).toHaveProperty('email');
+          expect(res.body.user.email).toBe('login@example.com');
+          expect(res.body.user.username).toBe('loginuser');
+          expect(res.body.user).not.toHaveProperty('password');
         });
     });
 
     it('should fail with wrong password', () => {
       return request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/api/users/login')
         .send({
-          email: 'login@example.com',
-          password: 'wrongpassword',
+          user: {
+            email: 'login@example.com',
+            password: 'wrongpassword',
+          },
         })
         .expect(401)
         .expect((res) => {
@@ -145,10 +165,12 @@ describe('Auth (e2e)', () => {
 
     it('should fail with non-existent email', () => {
       return request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/api/users/login')
         .send({
-          email: 'nonexistent@example.com',
-          password: 'password123',
+          user: {
+            email: 'nonexistent@example.com',
+            password: 'password123',
+          },
         })
         .expect(401)
         .expect((res) => {
@@ -159,17 +181,21 @@ describe('Auth (e2e)', () => {
     it('should not leak information about non-existent users', async () => {
       // Test that the error message is the same for wrong password and non-existent user
       const wrongPasswordResponse = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/api/users/login')
         .send({
-          email: 'login@example.com',
-          password: 'wrongpassword',
+          user: {
+            email: 'login@example.com',
+            password: 'wrongpassword',
+          },
         });
 
       const nonExistentUserResponse = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/api/users/login')
         .send({
-          email: 'nonexistent@example.com',
-          password: 'password123',
+          user: {
+            email: 'nonexistent@example.com',
+            password: 'password123',
+          },
         });
 
       expect(wrongPasswordResponse.status).toBe(401);
